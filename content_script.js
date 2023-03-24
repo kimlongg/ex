@@ -1,6 +1,8 @@
-chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-    if (request.action == "startEx") {
-        // Tạo một tab mới và chuyển đến trang HTML của tiện ích mở rộng
-        chrome.tabs.create({ url: chrome.runtime.getURL("popup.html") });
+chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
+    if (message === "getClickedItem") {
+        chrome.storage.local.get("clickedItem", function (data) {
+            sendResponse(data.clickedItem);
+        });
     }
+    return true;
 });

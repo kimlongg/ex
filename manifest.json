@@ -1,18 +1,27 @@
 {
-    "manifest_version": 3,
-    "name": "Tên Extension",
+    "name": "My Extension",
+    "description": "A brief description of my extension.",
     "version": "1.0",
-    "description": "Mô tả về Extension",
-    "action": {
-        "default_popup": "popup.html"
-    },
-    "permissions": [
-        "tabs",
-        "contextMenus",
-        "scripting",
-        "activeTab"
-    ],
+    "manifest_version": 3,
     "background": {
         "service_worker": "background.js"
-    }
+    },
+    "permissions": [
+        "storage",
+        "contextMenus",
+        "scripting"
+    ],
+    "host_permissions": [
+        "<all_urls>"
+    ],
+    "content_scripts": [
+        {
+            "matches": [
+                "<all_urls>"
+            ],
+            "js": [
+                "content_script.js"
+            ]
+        }
+    ]
 }
