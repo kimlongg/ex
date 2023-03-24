@@ -1,6 +1,6 @@
 {
     "name": "My Extension",
-    "description": "A brief description of my extension.",
+    "description": "This is my extension",
     "version": "1.0",
     "manifest_version": 3,
     "background": {
@@ -8,11 +8,7 @@
     },
     "permissions": [
         "storage",
-        "contextMenus",
-        "scripting"
-    ],
-    "host_permissions": [
-        "<all_urls>"
+        "activeTab"
     ],
     "content_scripts": [
         {
@@ -23,5 +19,8 @@
                 "content_script.js"
             ]
         }
-    ]
+    ],
+    "action": {},
+    "icons": {},
+    "content_security_policy": "script-src 'self' 'unsafe-inline'; object-src 'self'"
 }

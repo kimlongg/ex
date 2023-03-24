@@ -1,12 +1,31 @@
 <!DOCTYPE html>
 <html>
-  <head>
+
+<head>
     <meta charset="UTF-8">
     <title>Show me page</title>
-  </head>
-  <body>
+</head>
+
+<body>
     <h1>Hello, world!</h1>
     <div id="clicked-item"></div>
-    <script src="script.js"></script>
-  </body>
+    <script>
+        chrome.storage.local.get("clickedItem", function (data) {
+            if (data.clickedItem) {
+                var clickedItem = data.clickedItem;
+                var clickedItemType = clickedItem.menuItemId.split("_")[0];
+                var clickedItemValue = clickedItem[clickedItemType + "Url"];
+                if (clickedItemValue) {
+                    var clickedItemElement = document.createElement(clickedItemType);
+                    clickedItemElement.setAttribute("src", clickedItemValue);
+                    document.getElementById("clicked-item").appendChild(clickedItemElement);
+                    var clickedItemText = document.createTextNode(clickedItemValue);
+                    document.getElementById("clicked-item").appendChild(clickedItemText);
+                }
+            }
+        });
+
+    </script>
+</body>
+
 </html>

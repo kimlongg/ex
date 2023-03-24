@@ -1,48 +1,24 @@
-// Lưu thông tin về đối tượng tab
-let currentTab;
-
-// Hàm để mở tab mới chứa trang showme.html
-function openShowMePage(item) {
-    // Lấy thông tin về đường dẫn của trang showme.html
-    const url = chrome.runtime.getURL("showme.html");
-
-    // Tạo một tab mới và chuyển đến trang showme.html
-    chrome.tabs.create({ url: url }, function (tab) {
-        currentTab = tab;
-
-        // Gửi message tới content script để yêu cầu lấy đường dẫn của item
-        chrome.tabs.sendMessage(currentTab.id, { item });
+chrome.runtime.onInstalled.addListener(() => {
+    chrome.contextMenus.create({
+        id: "myContextMenu",
+        title: "Chọn tôi",
+        contexts: ["link", "image"],
     });
-}
-
-// Lắng nghe sự kiện người dùng click vào menu
-chrome.contextMenus.onClicked.addListener(function (info, tab) {
-    if (info.menuItemId === "myContextMenu") {
-        // Lưu thông tin về item mà người dùng đã click vào storage
-        chrome.storage.local.set({ clickedItem: info }, function () {
-            console.log("Thông tin liên kết hoặc hình ảnh đã được lưu vào chrome.storage.local: ", info);
-
-            // Kiểm tra xem đối tượng tab đã được khởi tạo chưa
-            if (!currentTab) {
-                // Nếu chưa thì mở tab mới chứa trang showme.html
-                openShowMePage(info);
-            } else {
-                // Nếu đã khởi tạo thì gửi message tới content script để yêu cầu lấy đường dẫn của item
-                chrome.tabs.sendMessage(currentTab.id, { item: info });
-            }
-        });
-    }
 });
 
-// Lắng nghe sự kiện nhấn vào icon của extension
-chrome.action.onClicked.addListener((tab) => {
-    // Lưu thông tin về tab hiện tại vào storage
-    chrome.storage.local.set({ currentTabId: tab.id }, function () {
-        console.log("Thông tin tab hiện tại đã được lưu vào chrome.storage.local: ", tab);
-    });
+chrome.contextMenus.onClicked.addListener(function (info, tab) {
+    if (info.menuItemId === "myContextMenu") {
+        const url = chrome.runtime.getURL("showme.html");
 
-    // Mở tab mới chứa trang showme.html
-    chrome.tabs.create({
-        url: chrome.runtime.getURL("showme.html"),
-    });
+        // Lưu link hoặc ảnh mà người dùng đã nhấn vào trong chrome.storage.local
+        chrome.storage.local.set({ clickedItem: info }, function () {
+            if (chrome.runtime.lastError) {
+                console.error(chrome.runtime.lastError);
+                return;
+            }
+            console.log("Thông tin liên kết hoặc hình ảnh đã được lưu vào chrome.storage.local: ", info);
+        });
+
+        chrome.tabs.create({ url: url });
+    }
 });
