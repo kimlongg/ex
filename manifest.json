@@ -22,5 +22,8 @@
     ],
     "action": {},
     "icons": {},
-    "content_security_policy": "script-src 'self' 'unsafe-inline'; object-src 'self'"
+    "host_permissions": [
+        "activeTab"
+    ],
+    "content_security_policy": "script-src 'self' 'nonce-random_value'"
 }
