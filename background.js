@@ -13,6 +13,7 @@ chrome.runtime.onInstalled.addListener(() => {
     });
 });
 
+
 async function handleContextMenuClick(info, tab) {
     const url = info.srcUrl || info.linkUrl;
     const type = info.srcUrl ? 'image' : 'link';
@@ -27,11 +28,13 @@ async function handleContextMenuClick(info, tab) {
     chrome.tabs.sendMessage(tab.id, { url, type });
 }
 
-chrome.contextMenus.onClicked.addListener((info, tab) => {
-    if (info.menuItemId === 'myContextMenu') {
-        handleContextMenuClick(info, tab);
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+    if (request.action == "startEx") {
+        // Tạo một tab mới và chuyển đến trang HTML của tiện ích mở rộng
+        chrome.tabs.create({ url: chrome.runtime.getURL("yourpage.html") });
     }
 });
+
 
 
 
