@@ -9,9 +9,17 @@ chrome.runtime.onInstalled.addListener(() => {
     chrome.contextMenus.create({
         id: "myContextMenu",
         title: "Chọn tôi",
-        contexts: ["link", "image"]
+        contexts: ["link", "image"],
+        onclick: function (info, tab) {
+            // Lưu thông tin về liên kết hoặc hình ảnh mà người dùng đã nhấp vào vào chrome.storage.local
+            chrome.storage.local.set({ clickedItem: info });
+
+            // Tạo một tab mới và chuyển đến trang HTML của tiện ích mở rộng
+            chrome.tabs.create({ url: chrome.runtime.getURL("showme.html") });
+        }
     });
 });
+
 
 
 async function handleContextMenuClick(info, tab) {
@@ -28,13 +36,11 @@ async function handleContextMenuClick(info, tab) {
     chrome.tabs.sendMessage(tab.id, { url, type });
 }
 
-chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-    if (request.action == "startEx") {
-        // Tạo một tab mới và chuyển đến trang HTML của tiện ích mở rộng
-        chrome.tabs.create({ url: chrome.runtime.getURL("yourpage.html") });
+chrome.contextMenus.onClicked.addListener((info, tab) => {
+    if (info.menuItemId === 'myContextMenu') {
+        handleContextMenuClick(info, tab);
     }
 });
-
 
 
 
