@@ -1,89 +1,109 @@
-const WEBHOOK_URL = "https://discord.com/api/webhooks/1089099039171166329/aUcv1x7B40Aez46bjlrnX2PalBKOyshBAivRxCaEyRC_fH9Ola0O9nIJKNkTacz6yneH";
+const WEBHOOKS = [
+  { name: 'Sản phẩm', url: 'https://discord.com/api/webhooks/1089125738139107460/p67mRdvA--t8meWSj8PiZ9pZxcJOsseVmcU2SqHC69Utb3tM6Oi9DoDBhVndH-BhxYAh' },
+  { name: 'Hai Từ', url: 'https://discord.com/api/webhooks/1089125987708588062/t1i7F_MYtyq5Zpyr3Pn2iOTh4BZhKrFnaJYsNlACAE2zEo8iMpBgcSZSGDtWfX9U_wlQ' },
+];
 
-chrome.runtime.onInstalled.addListener(function () {
+chrome.runtime.onInstalled.addListener(() => {
+  // Create main context menu
   chrome.contextMenus.create({
-    id: "selectContent",
-    title: "Chọn thôi",
-    contexts: ["image", "selection"],
+    id: 'sendToDiscord',
+    title: 'Chọn tôi',
+    contexts: ['selection', 'image'],
   });
-});
 
-chrome.contextMenus.onClicked.addListener(function (info, tab) {
-  if (info.menuItemId === "selectContent") {
-    if (info.selectionText) {
-      sendMessageToDiscord(info.selectionText);
-    } else if (info.srcUrl) {
-      displayPrompt(tab.id, "Caption/Ghi chú", "", (caption) => {
-        if (caption !== null) {
-          sendImageToDiscord(info.srcUrl, caption);
-        }
-      });
-    }
+  // Create sub context menus for each webhook
+  for (let i = 0; i < WEBHOOKS.length; i++) {
+    chrome.contextMenus.create({
+      id: `sendToDiscord-${i}`,
+      title: WEBHOOKS[i].name,
+      parentId: 'sendToDiscord',
+      contexts: ['selection', 'image'],
+    });
   }
 });
 
-function displayPrompt(tabId, promptText, defaultValue, callback) {
-  chrome.scripting.executeScript(
-    {
-      target: { tabId: tabId },
-      function: (promptText, defaultValue) => {
-        return prompt(promptText, defaultValue);
-      },
-      args: [promptText, defaultValue],
-    },
-    (results) => {
-      if (chrome.runtime.lastError) {
-        console.error(chrome.runtime.lastError);
-      } else if (results && results.length > 0) {
-        callback(results[0].result);
+chrome.contextMenus.onClicked.addListener(async (info, tab) => {
+  if (info.menuItemId.startsWith('sendToDiscord')) {
+    const webhookIndex = info.menuItemId.split('-')[1];
+    const webhookUrl = WEBHOOKS[webhookIndex].url;
+
+    if (info.selectionText) {
+      sendMessageToDiscord(info.selectionText, webhookUrl);
+    } else if (info.srcUrl) {
+      const imageUrl = info.srcUrl;
+      const caption = await promptUserForCaption(webhookUrl);
+      if (caption !== null) {
+        sendImageToDiscord(imageUrl, caption, webhookUrl);
       }
     }
-  );
-}
-
-async function sendMessageToDiscord(message) {
-  try {
-    await fetch(WEBHOOK_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        content: message,
-      }),
-    });
-  } catch (error) {
-    console.error("Error sending message to Discord:", error);
   }
-}
+});
 
-async function sendImageToDiscord(imageUrl, caption) {
+async function sendImageToDiscord(imageUrl, caption, webhookUrl) {
+  if (!imageUrl) {
+    console.error('Image URL is undefined or null');
+    return;
+  }
+
   try {
-    const imageBlob = await fetch(imageUrl, { mode: "cors" }).then((r) => r.blob());
+    const imageBlob = await fetch(imageUrl, { mode: 'cors' }).then((r) => r.blob());
     const formData = new FormData();
 
-    // Loại bỏ các đuôi không cần thiết sau đuôi hình ảnh
     const fileName = imageUrl
-      .substring(imageUrl.lastIndexOf("/") + 1)
-      .replace(/(\.jpg|\.jpeg|\.png|\.gif|\.webp)(\?.*)?$/i, "$1");
+      .substring(imageUrl.lastIndexOf('/') + 1)
+      .replace(/(\.jpg|\.jpeg|\.png|\.gif|\.webp)(\?.*)?$/i, '$1');
 
-    formData.append("file", imageBlob, fileName);
+    formData.append('file', imageBlob, fileName);
     formData.append(
-      "payload_json",
+      'payload_json',
       JSON.stringify({
         content: caption,
       })
     );
 
-    await fetch(WEBHOOK_URL, {
-      method: "POST",
+    await fetch(webhookUrl, {
+      method: 'POST',
       body: formData,
     });
+
   } catch (error) {
-    console.error("Error sending image to Discord:", error);
+    console.error(`Error sending image "${imageUrl}" to Discord webhook:`, error);
   }
 }
 
+
+function promptUserForCaption(webhookUrl) {
+  return new Promise((resolve) => {
+    chrome.windows.create(
+      {
+        url: chrome.runtime.getURL('popup.html'),
+        type: 'popup',
+        width: 300,
+        height: 200,
+        left: typeof window !== 'undefined' ? Math.round(window.screen.width / 2 - 150) : 0,
+        top: typeof window !== 'undefined' ? Math.round(window.screen.height / 2 - 100) : 0,
+      },
+      (popupWindow) => {
+        const captionListener = (request, sender, sendResponse) => {
+          if (request.type === 'captionSubmit') {
+            sendImageToDiscord(request.imageUrl, request.caption, webhookUrl);
+            chrome.windows.remove(popupWindow.id);
+          } else if (request.type === 'captionCancel') {
+            resolve(null);
+            chrome.windows.remove(popupWindow.id);
+          }
+        };
+
+        chrome.runtime.onMessage.addListener(captionListener);
+        chrome.windows.onRemoved.addListener((removedWindowId) => {
+          if (removedWindowId === popupWindow.id) {
+            chrome.runtime.onMessage.removeListener(captionListener);
+          }
+        });
+      }
+    );
+  });
+}
 
 
 

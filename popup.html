@@ -2,18 +2,75 @@
 <html>
   <head>
     <meta charset="UTF-8" />
-    <title>Chọn Nội Dung Extension</title>
+    <title>Chọn Nội Dung</title>
     <style>
       body {
-        width: 300px;
+        padding: 0;
         margin: 0;
-        padding: 10px;
+        font-family: sans-serif;
+        font-size: 14px;
+      }
+
+      h1 {
+        margin: 0;
+        padding: 0 0 10px 0;
+        font-size: 16px;
+      }
+
+      input[type="text"] {
+        display: block;
+        box-sizing: border-box;
+        width: 100%;
+        margin: 10px 0;
+        padding: 5px;
+        border-radius: 3px;
+        border: 1px solid #ccc;
+      }
+
+      button[type="submit"] {
+        display: block;
+        box-sizing: border-box;
+        width: 100%;
+        margin: 10px 0;
+        padding: 5px;
+        border-radius: 3px;
+        border: none;
+        background-color: #4caf50;
+        color: #fff;
+        font-size: 14px;
+      }
+
+      button[type="submit"]:hover {
+        background-color: #3e8e41;
+      }
+
+      button[type="button"] {
+        display: block;
+        box-sizing: border-box;
+        width: 100%;
+        margin: 10px 0;
+        padding: 5px;
+        border-radius: 3px;
+        border: none;
+        background-color: #f44336;
+        color: #fff;
+        font-size: 14px;
+      }
+
+      button[type="button"]:hover {
+        background-color: #d32f2f;
       }
     </style>
   </head>
   <body>
-    <h1>Chọn Nội Dung Extension</h1>
-    <p>Extension được phát triển bởi: Tên của bạn</p>
-    <script src="popup.js"></script>
+    <h1>Nhập Ghi Chú</h1>
+    <input type="text" id="caption" />
+	    <a href="#" target="_blank" id="image-url-link">Link hình ảnh</a>
+
+    <button type="submit" id="submit">Gửi</button>
+    <button type="button" id="cancel">Hủy</button>
+
+        <script src="popup.js"></script>
+
   </body>
 </html>

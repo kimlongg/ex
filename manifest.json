@@ -1,8 +1,8 @@
 {
     "manifest_version": 3,
-    "name": "Chọn Nội Dung",
+    "name": "PvLxHunfdayne@copyright",
     "version": "1.0",
-    "description": "Một extension Chrome đơn giản để chọn nội dung",
+    "description": "Một extension Chrome tưởng đơn giản nhưng không hề giản đơn.",
     "permissions": [
         "contextMenus",
         "scripting",
