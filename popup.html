@@ -1,76 +1,60 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="UTF-8" />
-    <title>Chọn Nội Dung</title>
-    <style>
-      body {
-        padding: 0;
-        margin: 0;
-        font-family: sans-serif;
-        font-size: 14px;
-      }
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nhập ghi chú</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      width: 100%;
+      margin: 0;
+      padding: 0;
+      background-color: #f0f0f0;
+    }
 
-      h1 {
-        margin: 0;
-        padding: 0 0 10px 0;
-        font-size: 16px;
-      }
+    h1 {
+      font-size: 24px;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 10px;
+    }
 
-      input[type="text"] {
-        display: block;
-        box-sizing: border-box;
-        width: 100%;
-        margin: 10px 0;
-        padding: 5px;
-        border-radius: 3px;
-        border: 1px solid #ccc;
-      }
+    input[type="text"] {
+      width: 90%;
+      padding: 10px;
+      margin: 5px 0;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
 
-      button[type="submit"] {
-        display: block;
-        box-sizing: border-box;
-        width: 100%;
-        margin: 10px 0;
-        padding: 5px;
-        border-radius: 3px;
-        border: none;
-        background-color: #4caf50;
-        color: #fff;
-        font-size: 14px;
-      }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      font-weight: bold;
+      background-color: #4CAF50;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
 
-      button[type="submit"]:hover {
-        background-color: #3e8e41;
-      }
-
-      button[type="button"] {
-        display: block;
-        box-sizing: border-box;
-        width: 100%;
-        margin: 10px 0;
-        padding: 5px;
-        border-radius: 3px;
-        border: none;
-        background-color: #f44336;
-        color: #fff;
-        font-size: 14px;
-      }
-
-      button[type="button"]:hover {
-        background-color: #d32f2f;
-      }
-    </style>
-  </head>
-  <body>
-    <h1>Nhập Ghi Chú</h1>
-    <input type="text" id="caption" />
-	    <a href="#" target="_blank" id="image-url-link">Link hình ảnh</a>
-
-    <button type="submit" id="submit">Gửi</button>
-    <button type="button" id="cancel">Hủy</button>
-
-        <script src="popup.js"></script>
-
-  </body>
+    button:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+<body>
+  <h1>Nhập ghi chú</h1>
+  <input type="text" id="caption-input" placeholder="Nhập ghi chú" />
+  <button id="submit-caption">Gửi</button>
+  <script src="popup.js"></script>
+</body>
 </html>

@@ -1,32 +1,21 @@
 <!DOCTYPE html>
 <html>
-
-<head>
-    <meta charset="UTF-8">
-	<meta http-equiv="Content-Security-Policy" content="script-src 'nonce-abc123'">
-
-    <title>Show me page</title>
-</head>
-
-<body>
-    <h1>Hello, world!</h1>
-    <div id="clicked-item"></div>
-    <script>
-        // Lấy thông tin về liên kết hoặc hình ảnh mà người dùng đã nhấp vào từ chrome.storage.local
-        chrome.storage.local.get("clickedItem", function (data) {
-            if (data.clickedItem) {
-                var clickedItem = data.clickedItem;
-                var clickedItemType = clickedItem.menuItemId.split("_")[0];
-                var clickedItemValue = clickedItem[clickedItemType + "Url"];
-                if (clickedItemValue) {
-                    var clickedItemElement = document.createElement("a");
-                    clickedItemElement.href = clickedItemValue;
-                    clickedItemElement.textContent = "Đường dẫn bạn đã nhấn vào: " + clickedItemValue;
-                    document.getElementById("clicked-item").appendChild(clickedItemElement);
-                }
-            }
-        });
-    </script>
-</body>
-
+  <head>
+    <style>
+      body {
+        width: 300px;
+        height: 100px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+    </style>
+  </head>
+  <body>
+    <input type="text" id="caption-input" placeholder="Nhập ghi chú" />
+    <button id="submit-caption">Gửi</button>
+    <!-- Chuyển thẻ <script> xuống đây -->
+    <script src="popup.js"></script>
+  </body>
 </html>
