@@ -1,29 +1,23 @@
 {
-    "name": "My Extension",
-    "description": "This is my extension",
-    "version": "1.0",
     "manifest_version": 3,
+    "name": "Chọn Nội Dung",
+    "version": "1.0",
+    "description": "Một extension Chrome đơn giản để chọn nội dung",
+    "permissions": [
+        "contextMenus",
+        "scripting",
+        "activeTab"
+    ],
+    "action": {
+        "default_popup": "popup.html",
+        "default_icon": {
+            "48": "icon48.png"
+        }
+    },
     "background": {
         "service_worker": "background.js"
     },
-    "permissions": [
-        "storage",
-        "activeTab"
-    ],
-    "content_scripts": [
-        {
-            "matches": [
-                "<all_urls>"
-            ],
-            "js": [
-                "content_script.js"
-            ]
-        }
-    ],
-    "action": {},
-    "icons": {},
-    "host_permissions": [
-        "activeTab"
-    ],
-    "content_security_policy": "script-src 'self' 'nonce-random_value'"
+    "icons": {
+        "48": "icon48.png"
+    }
 }
