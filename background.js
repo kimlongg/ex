@@ -1,4 +1,4 @@
-const WEBHOOK_URL = "https://discord.com/api/webhooks/1087454967935271083/rOAk8t9Bxwv1Bd9NrlGxZGj4-bP0xniEpmXrwzn9IYk0IVV-J62cBhIsFmq2jsDgygsy";
+const WEBHOOK_URL = "https://discord.com/api/webhooks/1089099039171166329/aUcv1x7B40Aez46bjlrnX2PalBKOyshBAivRxCaEyRC_fH9Ola0O9nIJKNkTacz6yneH";
 
 chrome.runtime.onInstalled.addListener(function () {
   chrome.contextMenus.create({
