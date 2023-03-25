@@ -31,7 +31,7 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
       sendMessageToDiscord(info.selectionText, webhookUrl);
     } else if (info.srcUrl) {
       const imageUrl = info.srcUrl;
-      const caption = await promptUserForCaption(webhookUrl);
+      const caption = await promptUserForCaption(webhookUrl, window);
       if (caption !== null) {
         sendImageToDiscord(imageUrl, caption, webhookUrl);
       }
@@ -39,12 +39,21 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
   }
 });
 
-async function sendImageToDiscord(imageUrl, caption, webhookUrl) {
-  if (!imageUrl) {
-    console.error('Image URL is undefined or null');
-    return;
+async function sendMessageToDiscord(message, webhookUrl) {
+  try {
+    await fetch(webhookUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ content: message }),
+    });
+  } catch (error) {
+    console.error('Error sending message to Discord:', error);
   }
+}
 
+async function sendImageToDiscord(imageUrl, caption, webhookUrl) {
   try {
     const imageBlob = await fetch(imageUrl, { mode: 'cors' }).then((r) => r.blob());
     const formData = new FormData();
@@ -65,12 +74,10 @@ async function sendImageToDiscord(imageUrl, caption, webhookUrl) {
       method: 'POST',
       body: formData,
     });
-
   } catch (error) {
-    console.error(`Error sending image "${imageUrl}" to Discord webhook:`, error);
+    console.error('Error sending image to Discord:', error);
   }
 }
-
 
 function promptUserForCaption(webhookUrl) {
   return new Promise((resolve) => {
@@ -80,8 +87,8 @@ function promptUserForCaption(webhookUrl) {
         type: 'popup',
         width: 300,
         height: 200,
-        left: typeof window !== 'undefined' ? Math.round(window.screen.width / 2 - 150) : 0,
-        top: typeof window !== 'undefined' ? Math.round(window.screen.height / 2 - 100) : 0,
+        left: Math.round(screen.width / 2 - 150),
+        top: Math.round(screen.height / 2 - 100),
       },
       (popupWindow) => {
         const captionListener = (request, sender, sendResponse) => {
@@ -95,15 +102,13 @@ function promptUserForCaption(webhookUrl) {
         };
 
         chrome.runtime.onMessage.addListener(captionListener);
-        chrome.windows.onRemoved.addListener((removedWindowId) => {
-          if (removedWindowId === popupWindow.id) {
-            chrome.runtime.onMessage.removeListener(captionListener);
-          }
+
+        chrome.windows.onRemoved.addListener(() => {
+          chrome.runtime.onMessage.removeListener(captionListener);
+          resolve(null);
         });
       }
     );
   });
 }
-
-
 
