@@ -88,22 +88,53 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
 
 function promptUserForPostFB(caption, imageUrl) {
   return new Promise((resolve) => {
-    // Truyền giá trị của nội dung và link ảnh vào trang options.html
+    // Lưu giá trị caption và imageUrl vào local storage của extension
     chrome.runtime.sendMessage({
-      type: 'SET_CAPTION',
-      caption: caption
-    });
-    chrome.runtime.sendMessage({
-      type: 'SET_IMAGE_URL',
+      type: 'CAPTION_IMAGE_DATA',
+      caption: caption,
       imageUrl: imageUrl
     });
 
-    const popupUrl = chrome.runtime.getURL('options.html');
-    chrome.windows.create({ url: popupUrl, type: 'popup', width: 500, height: 350 }, (popupWindow) => {
-      resolve();
+    // Lấy thông tin về tab đang được chọn
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      // Truyền thông tin về tab vào message để options.js có thể sử dụng
+      const tab = tabs[0];
+      chrome.runtime.sendMessage({
+        type: 'TAB_DATA',
+        tab: {
+          id: tab.id,
+          title: tab.title,
+          url: tab.url
+        }
+      });
+
+      // Kiểm tra xem có dữ liệu được tô đen hay không
+      chrome.tabs.executeScript(tab.id, { code: 'window.getSelection().toString();' }, (selection) => {
+        if (selection && selection[0]) {
+          // Nếu có dữ liệu, truyền nó vào message cùng với thông tin về tab
+          chrome.runtime.sendMessage({
+            type: 'TAB_SELECTION_DATA',
+            tab: {
+              id: tab.id,
+              title: tab.title,
+              url: tab.url
+            },
+            selection: selection[0]
+          });
+        }
+      });
+
+      // Mở trang options.html
+      const popupUrl = chrome.runtime.getURL('options.html');
+      chrome.windows.create({ url: popupUrl, type: 'popup', width: 500, height: 350 }, (popupWindow) => {
+        resolve();
+      });
     });
   });
 }
+
+
+
 
 function promptUserForCaption() {
   return new Promise((resolve) => {
