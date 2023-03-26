@@ -38,18 +38,18 @@ chrome.runtime.onInstalled.addListener(() => {
   // Create sub context menu "Đá vui" under "Đá Content"
   chrome.contextMenus.create({
     id: 'joke',
-    title: 'Đá vui',
+    title: '🤷‍♂️ Đá bài sang Page',
     parentId: 'sendToDiscord',
     contexts: ['selection', 'image'],
   });
 
   // Create sub context menu "Đá chính thức" under "Đá Content"
-  chrome.contextMenus.create({
-    id: 'official',
-    title: 'Đá chính thức',
-    parentId: 'sendToDiscord',
-    contexts: ['selection', 'image'],
-  });
+  // chrome.contextMenus.create({
+  //   id: 'official',
+  //   title: 'Đá chính thức',
+  //   parentId: 'sendToDiscord',
+  //   contexts: ['selection', 'image'],
+  // });
 });
 
 chrome.contextMenus.onClicked.addListener(async (info, tab) => {
@@ -78,7 +78,7 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
       imageUrl = info.srcUrl;
     }
 
-    promptUserForPostFB(caption, imageUrl); // Thay đổi ở đây
+    promptUserForPostFB(caption, imageUrl);
 
   } else if (info.menuItemId === 'official') {
     // handle "Đá chính thức" sub menu item
@@ -86,9 +86,15 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
   }
 });
 
+
+let selectedCaption = '';
+let selectedImageUrl = '';
+
+
 function promptUserForPostFB(caption, imageUrl) {
   // Lưu trữ nội dung được chọn vào chrome.storage.local
   selectedText = caption;
+  selectedImageUrl = imageUrl;
 
   // Đoạn mã hiện tại của bạn
   const optionsUrl = chrome.runtime.getURL('options.html');

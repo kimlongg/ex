@@ -4,9 +4,13 @@ let token;
 const urlParams = new URLSearchParams(window.location.search);
 
 // Hàm để nhận nội dung được chọn từ background.js
-chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-    if (request.selectedText) {
-        document.getElementById("image-link-input").value = request.selectedText;
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (message.selectedCaption) {
+        document.getElementById('caption-input').value = message.selectedCaption;
+    }
+
+    if (message.selectedImageUrl) {
+        document.getElementById('image-link-input').value = message.selectedImageUrl;
     }
 });
 
@@ -95,42 +99,66 @@ document.addEventListener('click', event => {
         imageLinkInput.value = imageUrl;
     }
 });
-
 postButton.addEventListener('click', () => {
     let pageId = pageSelect.value;
     let caption = captionInput.value;
-    let imageUrl = imageLinkInput.value;
+    const imageUrl = imageLinkInput.value;
+    if (imageUrl) {
+        try {
+            new URL(imageUrl);
+        } catch (e) {
+            console.error('Invalid image URL:', imageUrl);
+            return;
+        }
+    }
 
     if (pageId && caption) {
-        // Get page access token from Facebook API
         fetch(`https://graph.facebook.com/v13.0/${pageId}?fields=access_token&access_token=${token}`)
             .then(response => response.json())
             .then(data => {
                 let pageAccessToken = data.access_token;
-                // Post to page using page access token
+
                 let body = {
                     message: caption,
-                    access_token: pageAccessToken
+                    access_token: pageAccessToken,
                 };
+
                 if (imageUrl) {
                     body.url = imageUrl;
-                }
-                fetch(`https://graph.facebook.com/v13.0/${pageId}/feed`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(body)
-                })
-                    .then(() => {
-                        alert('Đăng bài thành công');
+
+                    fetch(`https://graph.facebook.com/v13.0/me/photos`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(body),
                     })
-                    .catch(error => {
-                        console.error(error);
-                        alert('Đã xảy ra lỗi khi đăng bài');
-                    });
+                        .then(() => {
+                            alert('Đăng bài thành công');
+                        })
+                        .catch((error) => {
+                            console.error(error);
+                            alert('Đã xảy ra lỗi khi đăng bài');
+                        });
+                } else {
+                    fetch(`https://graph.facebook.com/v13.0/${pageId}/feed`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(body),
+                    })
+                        .then(() => {
+                            alert('Đăng bài thành công');
+                        })
+                        .catch((error) => {
+                            console.error(error);
+                            alert('Đã xảy ra lỗi khi đăng bài');
+                        });
+                }
+
             })
-            .catch(error => {
+            .catch((error) => {
                 console.error(error);
                 alert('Đã xảy ra lỗi khi lấy token trang');
             });
@@ -138,3 +166,5 @@ postButton.addEventListener('click', () => {
         alert('Vui lòng nhập nội dung và chọn trang để đăng bài');
     }
 });
+
+
