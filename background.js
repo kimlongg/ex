@@ -25,6 +25,14 @@ chrome.runtime.onInstalled.addListener(() => {
     contexts: ['selection', 'image'],
   });
 
+  // Create sub context menu "Đá vui" under "Đá Content"
+  chrome.contextMenus.create({
+    id: 'joke',
+    title: '🤷‍♂️ Đá bài sang Page',
+    parentId: 'sendToDiscord',
+    contexts: ['selection', 'image'],
+  });
+  
   // Create sub context menus for each webhook
   for (let i = 0; i < WEBHOOKS.length; i++) {
     chrome.contextMenus.create({
@@ -34,14 +42,6 @@ chrome.runtime.onInstalled.addListener(() => {
       contexts: ['selection', 'image'],
     });
   }
-
-  // Create sub context menu "Đá vui" under "Đá Content"
-  chrome.contextMenus.create({
-    id: 'joke',
-    title: '🤷‍♂️ Đá bài sang Page',
-    parentId: 'sendToDiscord',
-    contexts: ['selection', 'image'],
-  });
 
   // Create sub context menu "Đá chính thức" under "Đá Content"
   // chrome.contextMenus.create({
@@ -86,11 +86,6 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
   }
 });
 
-
-let selectedCaption = '';
-let selectedImageUrl = '';
-
-
 function promptUserForPostFB(caption, imageUrl) {
   // Lưu trữ nội dung được chọn vào chrome.storage.local
   selectedText = caption;
@@ -101,7 +96,7 @@ function promptUserForPostFB(caption, imageUrl) {
   chrome.tabs.query({ url: optionsUrl }, function (tabs) {
     if (tabs.length) {
       chrome.tabs.update(tabs[0].id, { active: true });
-      chrome.tabs.sendMessage(tabs[0].id, { selectedText: selectedText });
+      chrome.tabs.sendMessage(tabs[0].id, { selectedText: selectedText, selectedImageUrl: selectedImageUrl });
     } else {
       chrome.tabs.create({ url: optionsUrl }, function (tab) {
         chrome.tabs.onUpdated.addListener(function listener(tabId, changeInfo) {

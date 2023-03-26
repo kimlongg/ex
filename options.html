@@ -8,56 +8,136 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.css">
     <title>Options</title>
     <style>
+        /* Định dạng nội dung trang */
         body {
             font-family: Arial, sans-serif;
+            background-color: #f7f7f7;
             display: flex;
-            flex-direction: column;
-            align-items: center;
             justify-content: center;
-            height: 100%;
-            width: 100%;
+            align-items: center;
+            min-height: 100vh;
             margin: 0;
-            padding: 0;
         }
 
+        /* Định dạng phần đầu tiên */
+        div:first-of-type {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Định dạng tiêu đề */
+        h1 {
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+
+        /* Định dạng các input và textarea */
         input[type="text"],
         textarea {
             width: 100%;
-            padding: 5px;
-            margin: 5px 0;
+            padding: 10px;
+            margin: 10px 0;
+            border: none;
+            border-bottom: 2px solid #007aff;
+            font-size: 16px;
         }
 
+        /* Định dạng các nút */
         button {
-            padding: 5px;
+            padding: 10px;
+            background-color: #007aff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
         }
 
+        button:hover {
+            opacity: 0.8;
+        }
+
+        #reset-token {
+            background-color: transparent;
+            color: #007aff;
+            margin-left: 5px;
+        }
+
+        #reset-token:hover {
+            background-color: #007aff;
+            color: #fff;
+        }
+
+        /* Định dạng select */
+        #page-select {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: none;
+            border-bottom: 2px solid #007aff;
+            font-size: 16px;
+        }
+
+        /* Định dạng textarea */
+        #caption-input {
+            height: 150px;
+            resize: none;
+            font-size: 16px;
+        }
+
+        /* Định dạng input */
+        #image-link-input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: none;
+            border-bottom: 2px solid #007aff;
+            font-size: 16px;
+        }
+
+        /* Định dạng nút đăng bài */
+        #post-button {
+            background-color: #5cb85c;
+            font-size: 16px;
+        }
+
+        #post-button:hover {
+            background-color: #449d44;
+        }
+
+        /* Định dạng kết quả đăng bài */
         #result {
             margin-top: 20px;
+            font-size: 16px;
         }
     </style>
 </head>
 
 <body>
-    <h1>Cài đặt</h1>
     <div>
-        <label for="token-input">Token Facebook:</label>
-        <input type="text" id="token-input">
-        <button id="save-token">Lưu</button>
-        <button id="reset-token">Xóa token</button>
-
-        <label for="page-select">Chọn trang:</label>
-        <select id="page-select">
-            <!-- options will be dynamically added here -->
-        </select>
-        <br>
-        <label for="caption-input">Nội dung:</label>
-        <br>
-        <textarea id="caption-input"></textarea>
-        <br>
-        <label for="image-link-input">Link ảnh:</label>
-        <input type="text" id="image-link-input" placeholder="Nhập link ảnh">
-        <br>
-        <button id="post-button">Đăng bài</button>
+        <h1 style="margin-top: 0;">Cài đặt</h1>
+        <div>
+            <label for="token-input" style="font-weight: bold;">Token Facebook:</label>
+            <input type="text" id="token-input">
+            <button id="save-token">Lưu</button>
+            <button id="reset-token">Xóa token</button>
+            <br>
+            <label for="page-select" style="font-weight: bold;">Chọn trang:</label>
+            <select id="page-select">
+                <!-- options will be dynamically added here -->
+            </select>
+            <br>
+            <label for="caption-input" style="font-weight: bold;">Nội dung:</label>
+            <br>
+            <textarea id="caption-input"></textarea>
+            <br>
+            <label for="image-link-input" style="font-weight: bold;">Link ảnh:</label>
+            <input type="text" id="image-link-input" placeholder="Nhập link ảnh">
+            <br>
+            <button id="post-button" style="margin-top: 10px;">Đăng bài</button>
+        </div>
     </div>
     <div id="result"></div>
 

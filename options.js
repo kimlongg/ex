@@ -4,15 +4,35 @@ let token;
 const urlParams = new URLSearchParams(window.location.search);
 
 // Hàm để nhận nội dung được chọn từ background.js
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    if (message.selectedCaption) {
-        document.getElementById('caption-input').value = message.selectedCaption;
-    }
+// Trong options.js
+// chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
+//     if (message.selectedCaption && message.selectedImageUrl) {
+//         // Lấy phần tử input và gán giá trị link ảnh
+//         const captionInput = document.querySelector('#caption-input');
+//         const imageInput = document.querySelector('#image-link-input');
+//         captionInput.value = message.selectedCaption;
+//         imageInput.value = message.selectedImageUrl;
+//     }
+// });
 
+chrome.runtime.onMessage.addListener((message) => {
+    if (message.selectedText) {
+        document.getElementById('caption-input').value = message.selectedText;
+    }
     if (message.selectedImageUrl) {
         document.getElementById('image-link-input').value = message.selectedImageUrl;
     }
 });
+
+// chrome.runtime.onMessage.addListener((message) => {
+//     // console.log(message.selectedImageUrl);
+//     if (message.selectedImageUrl) {
+//         document.getElementById('image-link-input').value = message.selectedImageUrl;
+//         console.log(message.selectedImageUrl);
+//     }
+// });
+
+
 
 
 chrome.storage.sync.get(['facebookToken'], ({ facebookToken }) => {
