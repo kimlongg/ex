@@ -78,7 +78,7 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
       imageUrl = info.srcUrl;
     }
 
-    promptUserForPostFB(caption, imageUrl);
+    promptUserForPostFB(caption, imageUrl); // Thay đổi ở đây
 
   } else if (info.menuItemId === 'official') {
     // handle "Đá chính thức" sub menu item
@@ -87,53 +87,27 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
 });
 
 function promptUserForPostFB(caption, imageUrl) {
-  return new Promise((resolve) => {
-    // Lưu giá trị caption và imageUrl vào local storage của extension
-    chrome.runtime.sendMessage({
-      type: 'CAPTION_IMAGE_DATA',
-      caption: caption,
-      imageUrl: imageUrl
-    });
+  // Lưu trữ nội dung được chọn vào chrome.storage.local
+  selectedText = caption;
 
-    // Lấy thông tin về tab đang được chọn
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      // Truyền thông tin về tab vào message để options.js có thể sử dụng
-      const tab = tabs[0];
-      chrome.runtime.sendMessage({
-        type: 'TAB_DATA',
-        tab: {
-          id: tab.id,
-          title: tab.title,
-          url: tab.url
-        }
+  // Đoạn mã hiện tại của bạn
+  const optionsUrl = chrome.runtime.getURL('options.html');
+  chrome.tabs.query({ url: optionsUrl }, function (tabs) {
+    if (tabs.length) {
+      chrome.tabs.update(tabs[0].id, { active: true });
+      chrome.tabs.sendMessage(tabs[0].id, { selectedText: selectedText });
+    } else {
+      chrome.tabs.create({ url: optionsUrl }, function (tab) {
+        chrome.tabs.onUpdated.addListener(function listener(tabId, changeInfo) {
+          if (tabId === tab.id && changeInfo.status === 'complete') {
+            chrome.tabs.onUpdated.removeListener(listener);
+            chrome.tabs.sendMessage(tabId, { selectedText: selectedText });
+          }
+        });
       });
-
-      // Kiểm tra xem có dữ liệu được tô đen hay không
-      chrome.tabs.executeScript(tab.id, { code: 'window.getSelection().toString();' }, (selection) => {
-        if (selection && selection[0]) {
-          // Nếu có dữ liệu, truyền nó vào message cùng với thông tin về tab
-          chrome.runtime.sendMessage({
-            type: 'TAB_SELECTION_DATA',
-            tab: {
-              id: tab.id,
-              title: tab.title,
-              url: tab.url
-            },
-            selection: selection[0]
-          });
-        }
-      });
-
-      // Mở trang options.html
-      const popupUrl = chrome.runtime.getURL('options.html');
-      chrome.windows.create({ url: popupUrl, type: 'popup', width: 500, height: 350 }, (popupWindow) => {
-        resolve();
-      });
-    });
+    }
   });
 }
-
-
 
 
 function promptUserForCaption() {

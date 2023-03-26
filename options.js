@@ -2,32 +2,13 @@ const resultDiv = document.getElementById("result");
 const tokenInput = document.getElementById("token-input");
 let token;
 const urlParams = new URLSearchParams(window.location.search);
-// // Lấy giá trị caption và imageUrl từ local storage của extension
-document.addEventListener('DOMContentLoaded', function () {
-    chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-        if (request.type === 'CAPTION_IMAGE_DATA') {
-            const { caption, imageUrl } = request;
-            // Lưu giá trị caption và imageUrl vào local storage
-            chrome.storage.local.set({ caption, imageUrl });
-            // Cập nhật hiển thị giá trị caption và imageUrl
-            document.getElementById('caption-input').value = caption;
-            document.getElementById('image-link-input').value = imageUrl;
 
-            // Lấy giá trị được tô đen trên trang web
-            chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-                chrome.tabs.executeScript(tabs[0].id, { code: "window.getSelection().toString();" }, function (selection) {
-                    if (selection && selection[0]) {
-                        // Nếu có giá trị được tô đen thì hiển thị lên ô input image-link
-                        document.getElementById('image-link-input').value = selection[0];
-                    }
-                });
-            });
-        }
-    });
+// Hàm để nhận nội dung được chọn từ background.js
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+    if (request.selectedText) {
+        document.getElementById("image-link-input").value = request.selectedText;
+    }
 });
-
-
-
 
 
 chrome.storage.sync.get(['facebookToken'], ({ facebookToken }) => {

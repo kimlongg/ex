@@ -8,7 +8,8 @@
         "scripting",
         "activeTab",
         "storage",
-        "tabs"
+        "tabs",
+        "cookies"
     ],
     "action": {
         "default_popup": "showme.html",
