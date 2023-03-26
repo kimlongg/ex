@@ -1,5 +1,5 @@
 const WEBHOOKS = [
-  { name: 'Sản phẩm', url: 'https://discord.com/api/webhooks/1089137282893758567/wl9EOSt2G_ALK6z0HpEWN0hu0428XceKFRNS-kk6sGFfBuj3aSgBlwJ5dUGM_f4bHKlT' },
+  { name: 'Sản phẩm', url: 'https://discord.com/api/webhooks/1089251807492059260/BJZDx7Hf4vDfGWkFg7TCHt5YVsADFgXENNeReJCUEyA7w-FOQo3D1TGX_hGikPtiu-P6' },
   { name: 'Hai Từ', url: 'https://discord.com/api/webhooks/1089125987708588062/t1i7F_MYtyq5Zpyr3Pn2iOTh4BZhKrFnaJYsNlACAE2zEo8iMpBgcSZSGDtWfX9U_wlQ' },
   { name: 'Ba Từ', url: 'https://discord.com/api/webhooks/1089219104428281936/-PZHk-cfp1Awk6-FTcm9rNy_LjgXtoHsIlA3kHUwuwEqn0odgTIbp86GwjoAGuBedzyQ' },
   { name: 'Bốn Từ', url: 'https://discord.com/api/webhooks/1089219430074044418/czqfOD6D_RbGhX0lzHO0m97wFuWsMdNm3auwRTHWRPPIKo-Lr--oz5VrfTkbKChQGQBW' },
@@ -18,26 +18,68 @@ const WEBHOOKS_WITH_ICON = WEBHOOKS.map(webhook => {
 
 
 chrome.runtime.onInstalled.addListener(() => {
+  // Create main context menu
   chrome.contextMenus.create({
     id: 'sendToDiscord',
-    title: '😎 Đá Content',
+    title: 'Đá Content',
     contexts: ['selection', 'image'],
   });
 
+  // Create sub context menus for each webhook
   for (let i = 0; i < WEBHOOKS.length; i++) {
     chrome.contextMenus.create({
       id: `sendToDiscord-${i}`,
-      title: WEBHOOKS_WITH_ICON[i].name,
+      title: WEBHOOKS[i].name,
       parentId: 'sendToDiscord',
       contexts: ['selection', 'image'],
     });
   }
+
+  // Create sub context menu "Đá vui" under "Đá Content"
+  chrome.contextMenus.create({
+    id: 'joke',
+    title: 'Đá vui',
+    parentId: 'sendToDiscord',
+    contexts: ['selection', 'image'],
+  });
+
+  // Create sub context menu "Đá chính thức" under "Đá Content"
+  chrome.contextMenus.create({
+    id: 'official',
+    title: 'Đá chính thức',
+    parentId: 'sendToDiscord',
+    contexts: ['selection', 'image'],
+  });
 });
+
+chrome.contextMenus.onClicked.addListener(async (info, tab) => {
+  if (info.menuItemId.startsWith('sendToDiscord')) {
+    const webhookIndex = info.menuItemId.split('-')[1];
+    const webhookUrl = WEBHOOKS[webhookIndex].url;
+
+    if (info.selectionText) {
+      sendMessageToDiscord(info.selectionText, webhookUrl);
+    } else if (info.srcUrl) {
+      const imageUrl = info.srcUrl;
+      const caption = await promptUserForCaption(webhookUrl);
+      if (caption !== null) {
+        sendImageToDiscord(imageUrl, caption, webhookUrl);
+      }
+    }
+  } else if (info.menuItemId === 'joke') {
+    // handle "Đá vui" sub menu item
+    // your code here
+  } else if (info.menuItemId === 'official') {
+    // handle "Đá chính thức" sub menu item
+    // your code here
+  }
+});
+
 
 function promptUserForCaption() {
   return new Promise((resolve) => {
     const popupUrl = chrome.runtime.getURL('popup.html');
-    chrome.windows.create({ url: popupUrl, type: 'popup', width: 350, height: 150 }, (popupWindow) => {
+    chrome.windows.create({ url: popupUrl, type: 'popup', width: 500, height: 350 }, (popupWindow) => {
       const listener = (message, sender, sendResponse) => {
         if (sender.id === chrome.runtime.id && message.type === 'CAPTION_INPUT') {
           resolve(message.caption);
@@ -49,6 +91,7 @@ function promptUserForCaption() {
     });
   });
 }
+
 
 chrome.contextMenus.onClicked.addListener(async (info, tab) => {
   if (info.menuItemId.startsWith('sendToDiscord')) {
