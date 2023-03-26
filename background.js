@@ -88,34 +88,22 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
 
 function promptUserForPostFB(caption, imageUrl) {
   return new Promise((resolve) => {
-    const popupUrl = chrome.runtime.getURL('options.html');
-    let popupWindowId;
-    chrome.windows.create({ url: popupUrl, type: 'popup', width: 500, height: 350 }, (popupWindow) => {
-      popupWindowId = popupWindow.id;
+    // Truyền giá trị của nội dung và link ảnh vào trang options.html
+    chrome.runtime.sendMessage({
+      type: 'SET_CAPTION',
+      caption: caption
     });
-    chrome.windows.onRemoved.addListener((windowId) => {
-      if (windowId === popupWindowId) {
-        chrome.storage.local.get(['caption', 'imageUrl'], (data) => {
-          if (chrome.runtime.lastError) {
-            // Handle error here
-          } else {
-            resolve(data.caption);
-          }
-        });
-        chrome.storage.local.remove(['caption', 'imageUrl']);
-      }
+    chrome.runtime.sendMessage({
+      type: 'SET_IMAGE_URL',
+      imageUrl: imageUrl
     });
 
-    // Truyền giá trị của nội dung và link ảnh vào trang options.html
-    chrome.storage.local.set({ caption: caption, imageUrl: imageUrl }, () => {
-      if (chrome.runtime.lastError) {
-        // Handle error here
-      }
+    const popupUrl = chrome.runtime.getURL('options.html');
+    chrome.windows.create({ url: popupUrl, type: 'popup', width: 500, height: 350 }, (popupWindow) => {
+      resolve();
     });
   });
 }
-
-
 
 function promptUserForCaption() {
   return new Promise((resolve) => {

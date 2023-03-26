@@ -4,18 +4,24 @@ let token;
 const urlParams = new URLSearchParams(window.location.search);
 
 
-chrome.storage.local.get(['caption', 'imageUrl'], (result) => {
-    const caption = result.caption;
-    const imageUrl = result.imageUrl;
-    console.log('Caption:', caption);
-    console.log('Image URL:', imageUrl);
-    if (caption) {
-        document.getElementById('captionInput').value = caption;
-    }
-    if (imageUrl) {
-        document.getElementById('imagePreview').src = imageUrl;
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (message.type === 'SET_CAPTION') {
+        const caption = message.caption;
+        console.log('Caption:', caption);
+        // Do something with caption
+    } else if (message.type === 'SET_IMAGE_URL') {
+        const imageUrl = message.imageUrl;
+        console.log('Image URL:', imageUrl);
+        // Do something with imageUrl
     }
 });
+
+// chrome.runtime.sendMessage({
+//     type: 'SAVE_CAPTION',
+//     caption: caption
+//   }, () => {
+//     // Handle error here
+//   });
 
 
 chrome.storage.sync.get(['facebookToken'], ({ facebookToken }) => {
