@@ -67,13 +67,54 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
       }
     }
   } else if (info.menuItemId === 'joke') {
-    // handle "Đá vui" sub menu item
-    // your code here
+    let caption = '';
+    let imageUrl = '';
+
+    if (info.selectionText) {
+      caption = info.selectionText;
+    }
+
+    if (info.srcUrl) {
+      imageUrl = info.srcUrl;
+    }
+
+    promptUserForPostFB(caption, imageUrl);
+
   } else if (info.menuItemId === 'official') {
     // handle "Đá chính thức" sub menu item
     // your code here
   }
 });
+
+function promptUserForPostFB(caption, imageUrl) {
+  return new Promise((resolve) => {
+    const popupUrl = chrome.runtime.getURL('options.html');
+    let popupWindowId;
+    chrome.windows.create({ url: popupUrl, type: 'popup', width: 500, height: 350 }, (popupWindow) => {
+      popupWindowId = popupWindow.id;
+    });
+    chrome.windows.onRemoved.addListener((windowId) => {
+      if (windowId === popupWindowId) {
+        chrome.storage.local.get(['caption', 'imageUrl'], (data) => {
+          if (chrome.runtime.lastError) {
+            // Handle error here
+          } else {
+            resolve(data.caption);
+          }
+        });
+        chrome.storage.local.remove(['caption', 'imageUrl']);
+      }
+    });
+
+    // Truyền giá trị của nội dung và link ảnh vào trang options.html
+    chrome.storage.local.set({ caption: caption, imageUrl: imageUrl }, () => {
+      if (chrome.runtime.lastError) {
+        // Handle error here
+      }
+    });
+  });
+}
+
 
 
 function promptUserForCaption() {
@@ -91,24 +132,6 @@ function promptUserForCaption() {
     });
   });
 }
-
-
-chrome.contextMenus.onClicked.addListener(async (info, tab) => {
-  if (info.menuItemId.startsWith('sendToDiscord')) {
-    const webhookIndex = info.menuItemId.split('-')[1];
-    const webhookUrl = WEBHOOKS[webhookIndex].url;
-
-    if (info.selectionText) {
-      sendMessageToDiscord(info.selectionText, webhookUrl);
-    } else if (info.srcUrl) {
-      const imageUrl = info.srcUrl;
-      const caption = await promptUserForCaption();
-      if (caption !== null) {
-        sendImageToDiscord(imageUrl, caption, webhookUrl);
-      }
-    }
-  }
-});
 
 async function sendMessageToDiscord(message, webhookUrl) {
   try {
